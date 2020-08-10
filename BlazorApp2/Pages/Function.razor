@@ -1,0 +1,22 @@
+﻿@page "/function"
+@inject HttpClient Http
+
+<h1>Test HTTP POST</h1>
+
+<p>Received Data: @body</p>
+
+<button class="btn btn-primary" @onclick="OnClickAsync">Click me</button>
+
+@code {
+    private string body = "";
+
+    private async Task OnClickAsync(MouseEventArgs e)
+    {
+        var json = @"{""name"":""azure""}";
+        var content = new StringContent(json, Encoding.UTF8);
+
+        var receivedMessage = await Http.PostAsync("http://localhost:7071/api/Function1", content);
+        Console.WriteLine(await receivedMessage.Content.ReadAsStringAsync());
+        body = await receivedMessage.Content.ReadAsStringAsync();
+    }
+}
