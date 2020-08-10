@@ -5,17 +5,36 @@
 
 <p>Received Data: @body</p>
 
-<button class="btn btn-primary" @onclick="OnClickAsync">Send Data</button>
+<input @bind="modelName" />
+<button class="btn btn-primary" @onclick="OnClickAsyncWithClass">Send Data</button>
 
 @code {
+    private string functionUrl = @"http://localhost:7071/api/Function1";
+
+    private class PostDataModel
+    {
+        [Required]
+        public string name { get; set; }
+    }
+
+    private string modelName;
     private string body = "";
 
-    private async Task OnClickAsync(MouseEventArgs e)
+    private async Task OnClickAsyncWithClass(MouseEventArgs e)
     {
-        var json = @"{""name"":""azure""}";
+        PostDataModel postDataModel = new PostDataModel { name = modelName };
+
+        var receivedMessage = await Http.PostAsJsonAsync(functionUrl, postDataModel);
+        Console.WriteLine(await receivedMessage.Content.ReadAsStringAsync());
+        body = await receivedMessage.Content.ReadAsStringAsync();
+    }
+
+    private async Task OnClickAsyncWithString(MouseEventArgs e)
+    {
+        var json = @"{""name"":""" + modelName + @"""}";
         var content = new StringContent(json, Encoding.UTF8);
 
-        var receivedMessage = await Http.PostAsync("http://localhost:7071/api/Function1", content);
+        var receivedMessage = await Http.PostAsync(functionUrl, content);
         Console.WriteLine(await receivedMessage.Content.ReadAsStringAsync());
         body = await receivedMessage.Content.ReadAsStringAsync();
     }
